@@ -3,6 +3,7 @@ import 'package:robbin/src/pages/Home.dart';
 import 'package:robbin/src/pages/HomePage.dart';
 import 'package:robbin/src/pages/Login.dart';
 import 'package:robbin/src/pages/Registro.dart';
+import 'package:robbin/src/pages/subirPost.dart';
 
 class Run extends StatelessWidget {
   @override
@@ -15,7 +16,8 @@ class Run extends StatelessWidget {
         '/': (BuildContext context) => HomePage(),
         'login': (BuildContext context) => Login(),
         'registro': (BuildContext context) => Registro(),
-        'home': (BuildContext context) => Home()
+        'home': (BuildContext context) => Home(),
+        'subirpost': (BuildContext context) => SubirPost()
       },
     );
   }

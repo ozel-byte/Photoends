@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:robbin/src/service/API.dart';
 
@@ -14,6 +17,7 @@ class _RegistroState extends State<Registro> {
   bool validRegistro = false;
   bool validRegistroError = false;
   bool validCamposVacios = false;
+  String? _image;
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -55,6 +59,29 @@ class _RegistroState extends State<Registro> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          _image != null
+              ? CircleAvatar(
+                  radius: 60,
+                  backgroundColor: Colors.white.withOpacity(0.5),
+                  backgroundImage: FileImage(File(_image!)),
+                  child: IconButton(
+                      onPressed: () {
+                        cargarImg();
+                      },
+                      icon: Icon(
+                        Icons.photo_camera,
+                        color: Colors.white.withOpacity(0.6),
+                      )),
+                )
+              : CircleAvatar(
+                  radius: 60,
+                  backgroundColor: Colors.white.withOpacity(0.5),
+                  child: IconButton(
+                      onPressed: () {
+                        cargarImg();
+                      },
+                      icon: Icon(Icons.photo_camera)),
+                ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 40),
             child: TextField(
@@ -130,8 +157,8 @@ class _RegistroState extends State<Registro> {
       validCamposVacios = false;
       validRegistro = true;
       setState(() {});
-      final resp =
-          await Api().registro(_controllerName.text, _controlPassowrd.text);
+      final resp = await Api()
+          .registro(_controllerName.text, _controlPassowrd.text, _image);
 
       if (resp == "ok") {
         setState(() {
@@ -146,6 +173,14 @@ class _RegistroState extends State<Registro> {
         });
       }
     }
+  }
+
+  void cargarImg() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+
+    _image = result!.files.single.path;
+
+    setState(() {});
   }
 
   void guardarIdSharedPreferences() {}

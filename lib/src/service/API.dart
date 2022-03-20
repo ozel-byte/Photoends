@@ -1,7 +1,7 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:http/http.dart' as http;
-import 'package:robbin/src/service/SharedPreferences.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Api {
@@ -26,10 +26,16 @@ class Api {
     }
   }
 
-  Future<String> registro(name, password) async {
+  Future<String> registro(name, password, img) async {
+    File file_img = File(img);
+    List<int> imageBytes = file_img.readAsBytesSync();
     final url = Uri.parse("http://192.168.0.19:5000/add-user");
     final response = await http.post(url,
-        body: jsonEncode({"name": name, "password": password}));
+        body: jsonEncode({
+          "name": name,
+          "password": password,
+          "img": base64Encode(imageBytes)
+        }));
 
     if (response.statusCode == 200) {
       final json_response = jsonDecode(response.body);
@@ -41,8 +47,31 @@ class Api {
     }
   }
 
-  sendImg(img) async {
+  sendImg(img, key) async {
+    File file_img = File(img);
+    List<int> imageBytes = file_img.readAsBytesSync();
     final url = Uri.parse("http://192.168.0.19:5000/set-img-profile-user");
-    final response = await http.post(url, body: jsonEncode({"img": img}));
+    final response = await http.post(url,
+        body: jsonEncode({"img": base64Encode(imageBytes), "key": key}));
+
+    if (response.statusCode == 200) {
+      final jsonResponse = jsonDecode(response.body);
+      print(jsonResponse['status']);
+      return jsonResponse['status'];
+    } else {
+      return 'Error de peticion';
+    }
+  }
+
+  Future<dynamic> getImg(key) async {
+    final url = Uri.parse("http://192.168.0.19:5000/get-image-user?key=$key");
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      final jsonResponse = jsonDecode(response.body);
+      print(jsonResponse['arrayPhoto']);
+      return jsonResponse['arrayPhoto'];
+    } else {
+      return [];
+    }
   }
 }

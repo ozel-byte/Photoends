@@ -62,7 +62,11 @@ class _LoginState extends State<Login> {
                 setState(() {});
               },
               controller: _controllerName,
-              decoration: InputDecoration(hintText: 'Usuario'),
+              decoration: InputDecoration(
+                  enabledBorder: OutlineInputBorder(),
+                  focusedBorder: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.person),
+                  hintText: 'Usuario'),
             ),
           ),
           SizedBox(height: 20),
@@ -75,6 +79,9 @@ class _LoginState extends State<Login> {
               },
               controller: _controllerPassword,
               decoration: InputDecoration(
+                  focusedBorder: OutlineInputBorder(),
+                  enabledBorder: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.lock_outline_rounded),
                   counterText: !loginValid ? '' : 'Error de credenciales',
                   counterStyle: TextStyle(color: Colors.red),
                   hintText: 'Password'),

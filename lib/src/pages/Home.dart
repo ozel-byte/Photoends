@@ -1,8 +1,10 @@
-import 'dart:html';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
-
+import 'package:robbin/src/service/API.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:file_picker/file_picker.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -14,15 +16,19 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   String? key = "";
   SharedPreferences? shared;
+  double validReadPublicacion = 450;
+  String? _image;
   @override
   void initState() {
     super.initState();
     loadKey();
+    //loadingImgUserNew();
   }
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    Api ap = Api();
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -60,56 +66,37 @@ class _HomeState extends State<Home> {
             "PhotoEnds",
             style: TextStyle(color: Colors.black),
           )),
-      body: ListView(
-        children: [
-          generarCard(size, Colors.red),
-          generarCard(size, Colors.blue),
-          generarCard(size, Colors.yellow),
-          generarCard(size, Colors.green)
-        ],
+      body: RefreshIndicator(
+        child: FutureBuilder(
+          future: ap.getImg(key),
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
+            if (snapshot.hasData) {
+              return ListView.builder(
+                itemCount: snapshot.data!.length,
+                itemBuilder: (context, index) {
+                  return generarCard(size, Colors.white, snapshot.data![index]);
+                },
+              );
+            } else {
+              return const CircularProgressIndicator();
+            }
+          },
+        ),
+        onRefresh: onRefresh,
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          showModalBottomSheet(
-              context: context,
-              builder: (BuildContext context) {
-                return Container(
-                  height: 400,
-                  color: Colors.red,
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          IconButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              icon: Icon(Icons.close))
-                        ],
-                      ),
-                      Text("Subir Publicacion"),
-                      Text("Descripcion"),
-                      TextField(
-                        decoration: InputDecoration(
-                            enabledBorder: OutlineInputBorder(),
-                            focusedBorder: OutlineInputBorder(),
-                            hintText: "Ingrese una descripcion"),
-                      ),
-                    ],
-                  ),
-                );
-              });
+          Navigator.pushNamed(context, 'subirpost');
         },
         child: Icon(Icons.add),
       ),
     );
   }
 
-  Widget generarCard(Size size, Color color) {
+  Widget generarCard(Size size, Color color, photo) {
     return Container(
       width: size.width * 0.2,
-      height: size.height * 0.3,
+      height: size.height * 0.35,
       child: Column(
         children: [
           Row(
@@ -130,21 +117,24 @@ class _HomeState extends State<Home> {
             ],
           ),
           Text("Here go wherever i go"),
-          SizedBox(
-            height: 10,
-          ),
           Container(
             width: size.width * 1,
-            height: size.height * 0.2,
+            height: size.height * 0.25,
             decoration: BoxDecoration(
                 image: DecorationImage(
-                    fit: BoxFit.cover,
-                    image: NetworkImage(
-                        "https://images.pexels.com/photos/9808579/pexels-photo-9808579.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"))),
-          )
+                    fit: BoxFit.contain, image: NetworkImage(photo['photo']))),
+          ),
+          Divider()
         ],
       ),
     );
+  }
+
+  void cargarImg() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+
+    _image = result!.files.single.path;
+    setState(() {});
   }
 
   void loadKey() async {
@@ -153,4 +143,10 @@ class _HomeState extends State<Home> {
       key = prefs.getString('key');
     });
   }
+
+  void loadingImgUserNew() {
+    Api().getImg(key);
+  }
+
+  Future<void> onRefresh() async {}
 }
