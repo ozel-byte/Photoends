@@ -36,10 +36,10 @@ class _LoginState extends State<Login> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Welcome",
+              "Bienvenido",
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40),
             ),
-            Text("Sign in to continue",
+            Text("Inicia sesion para continuar con la aventura",
                 style: TextStyle(fontWeight: FontWeight.w300, fontSize: 18))
           ],
         ),
@@ -73,6 +73,7 @@ class _LoginState extends State<Login> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 40),
             child: TextField(
+              obscureText: true,
               onChanged: (v) {
                 loginValid = false;
                 setState(() {});
@@ -102,7 +103,7 @@ class _LoginState extends State<Login> {
           TextButton(
               style: ButtonStyle(
                   padding: MaterialStateProperty.all(
-                      EdgeInsets.symmetric(horizontal: 100)),
+                      EdgeInsets.symmetric(horizontal: 100, vertical: 20)),
                   backgroundColor: MaterialStateProperty.all(Colors.blue)),
               onPressed: () {
                 logearse();

@@ -26,7 +26,7 @@ class Api {
     }
   }
 
-  Future<String> registro(name, password, img) async {
+  Future<String> registro(name, password, img, mail) async {
     File file_img = File(img);
     List<int> imageBytes = file_img.readAsBytesSync();
     final url = Uri.parse("http://192.168.0.19:5000/add-user");
@@ -34,14 +34,17 @@ class Api {
         body: jsonEncode({
           "name": name,
           "password": password,
-          "img": base64Encode(imageBytes)
+          "img": base64Encode(imageBytes),
+          "mail": mail
         }));
 
     if (response.statusCode == 200) {
       final json_response = jsonDecode(response.body);
-      final pref = await SharedPreferences.getInstance();
-      pref.setString("key", json_response["data"]);
-      return json_response["status"].toString();
+      if (json_response["data"] != "ya") {
+        final pref = await SharedPreferences.getInstance();
+        pref.setString("key", json_response["data"]);
+      }
+      return "ya";
     } else {
       return "Error de peticion";
     }

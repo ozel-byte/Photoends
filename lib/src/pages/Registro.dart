@@ -14,6 +14,7 @@ class Registro extends StatefulWidget {
 class _RegistroState extends State<Registro> {
   final TextEditingController _controllerName = TextEditingController();
   final TextEditingController _controlPassowrd = TextEditingController();
+  final TextEditingController _controllermail = TextEditingController();
   bool validRegistro = false;
   bool validRegistroError = false;
   bool validCamposVacios = false;
@@ -33,19 +34,25 @@ class _RegistroState extends State<Registro> {
   Widget descripcion(Size size) {
     return Container(
       width: size.width * 1,
-      height: size.height * 0.3,
+      height: size.height * 0.2,
       child: Padding(
-        padding: const EdgeInsets.only(left: 20),
-        child: Column(
+        padding: const EdgeInsets.only(left: 0),
+        child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              "Hi!",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text(
+                  "Registro!",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40),
+                ),
+                Text("Crea una cuenta para ver",
+                    style:
+                        TextStyle(fontWeight: FontWeight.w300, fontSize: 18)),
+                Text("lo que comparten tus amigos")
+              ],
             ),
-            Text("Create a new count",
-                style: TextStyle(fontWeight: FontWeight.w300, fontSize: 18))
           ],
         ),
       ),
@@ -55,9 +62,9 @@ class _RegistroState extends State<Registro> {
   Widget inputs(Size size) {
     return Container(
       width: size.width * 1,
-      height: size.height * 0.4,
+      height: size.height * 0.6,
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           _image != null
               ? CircleAvatar(
@@ -90,10 +97,26 @@ class _RegistroState extends State<Registro> {
                 setState(() {});
               },
               controller: _controllerName,
-              decoration: InputDecoration(hintText: 'Usuario'),
+              decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.person),
+                  enabledBorder: OutlineInputBorder(),
+                  hintText: 'Usuario'),
             ),
           ),
-          SizedBox(height: 30),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40),
+            child: TextField(
+              onChanged: (v) {
+                validCamposVacios = false;
+                setState(() {});
+              },
+              controller: _controllermail,
+              decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.email_outlined),
+                  enabledBorder: OutlineInputBorder(),
+                  hintText: 'Correo'),
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 40),
             child: TextField(
@@ -108,6 +131,9 @@ class _RegistroState extends State<Registro> {
                       : validRegistroError
                           ? 'No se pudo crear la cuenta'
                           : '',
+                  enabledBorder: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.lock_outline_rounded),
+                  suffixIcon: Icon(Icons.remove_red_eye),
                   counterStyle: TextStyle(color: Colors.red),
                   hintText: 'Password'),
             ),
@@ -127,7 +153,7 @@ class _RegistroState extends State<Registro> {
           TextButton(
               style: ButtonStyle(
                   padding: MaterialStateProperty.all(
-                      EdgeInsets.symmetric(horizontal: 100)),
+                      EdgeInsets.symmetric(horizontal: 100, vertical: 20)),
                   backgroundColor: MaterialStateProperty.all(Colors.blue)),
               onPressed: () {
                 registro();
@@ -146,7 +172,9 @@ class _RegistroState extends State<Registro> {
   }
 
   void registro() async {
-    if (_controlPassowrd.text.isEmpty || _controllerName.text.isEmpty) {
+    if (_controlPassowrd.text.isEmpty ||
+        _controllerName.text.isEmpty ||
+        _image == null) {
       validRegistroError = false;
       validRegistro = false;
       setState(() {
@@ -157,8 +185,8 @@ class _RegistroState extends State<Registro> {
       validCamposVacios = false;
       validRegistro = true;
       setState(() {});
-      final resp = await Api()
-          .registro(_controllerName.text, _controlPassowrd.text, _image);
+      final resp = await Api().registro(_controllerName.text,
+          _controlPassowrd.text, _image, _controllermail.text);
 
       if (resp == "ok") {
         setState(() {
