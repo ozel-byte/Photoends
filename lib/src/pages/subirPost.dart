@@ -17,6 +17,8 @@ class _SubirPostState extends State<SubirPost> {
   String? _image;
   var _imagev2;
   String? key = "";
+  bool loadingImagesCLoud = false;
+  List<PlatformFile> listImgFile = [];
 
   @override
   void initState() {
@@ -54,24 +56,24 @@ class _SubirPostState extends State<SubirPost> {
               width: size.width * 0.8,
               height: size.height * 0.2,
               decoration: BoxDecoration(
-                  color: Colors.pink[200],
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                        color: Colors.grey.withOpacity(0.5),
+                        spreadRadius: 5,
+                        blurRadius: 7,
+                        offset: Offset(0, 3))
+                  ],
                   borderRadius: BorderRadius.circular(10)),
               child: _image != null
                   ? Image.file(
                       File(_image!),
                       fit: BoxFit.contain,
                     )
-                  : Center(child: Text("Comparte una foto"))),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 40),
-            child: TextField(
-              onTap: () {
-                validReadPublicacion = 750;
-                setState(() {});
-              },
-              decoration: InputDecoration(hintText: "Ingrese una descripcion"),
-            ),
-          ),
+                  : Center(
+                      child: listImgFile.isEmpty
+                          ? Text("Comparte una foto")
+                          : Text("Se selecionaron varias images"))),
           SizedBox(
             height: 20,
           ),
@@ -82,12 +84,15 @@ class _SubirPostState extends State<SubirPost> {
               child: Text("Cargar Imagen")),
           TextButton(
               onPressed: () async {
-                if (_image != null) {
-                  final resp = await Api().sendImg(_image, key);
+                if (listImgFile.isNotEmpty) {
+                  loadingImagesCLoud = true;
+                  final resp = await Api().sendImg(listImgFile, key);
                   print(resp);
                   if (resp == "ok") {
+                    loadingImagesCLoud = false;
+                    setState(() {});
                     print("entro aqui");
-                    Navigator.pop(context);
+                    Navigator.pushReplacementNamed(context, 'home');
                   }
                 }
               },
@@ -98,9 +103,14 @@ class _SubirPostState extends State<SubirPost> {
   }
 
   void cargarImg() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
-
-    _image = result!.files.single.path;
+    FilePickerResult? result =
+        await FilePicker.platform.pickFiles(allowMultiple: true);
+    if (result!.files.length > 1) {
+      listImgFile = result.files;
+    } else {
+      print("Un archivo");
+      _image = result.files.single.path;
+    }
 
     setState(() {});
   }

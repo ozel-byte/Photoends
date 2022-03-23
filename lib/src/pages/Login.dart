@@ -111,9 +111,13 @@ class _LoginState extends State<Login> {
               child: login
                   ? Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                        strokeWidth: 4,
+                      child: SizedBox(
+                        width: 30,
+                        height: 30,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 4,
+                        ),
                       ),
                     )
                   : Text(

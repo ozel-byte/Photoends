@@ -15,6 +15,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   String? key = "";
+  String? profileImg = "";
   SharedPreferences? shared;
   double validReadPublicacion = 450;
   String? _image;
@@ -22,7 +23,6 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     loadKey();
-    //loadingImgUserNew();
   }
 
   @override
@@ -51,6 +51,7 @@ class _HomeState extends State<Home> {
               children: [
                 CircleAvatar(
                   backgroundColor: Colors.blue,
+                  backgroundImage: NetworkImage(profileImg!),
                 ),
                 Icon(
                   Icons.arrow_drop_down,
@@ -78,7 +79,7 @@ class _HomeState extends State<Home> {
                 },
               );
             } else {
-              return const CircularProgressIndicator();
+              return Center(child: const CircularProgressIndicator());
             }
           },
         ),
@@ -86,7 +87,7 @@ class _HomeState extends State<Home> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pushNamed(context, 'subirpost');
+          Navigator.pushReplacementNamed(context, 'subirpost');
         },
         child: Icon(Icons.add),
       ),
@@ -105,8 +106,7 @@ class _HomeState extends State<Home> {
                 width: 10,
               ),
               CircleAvatar(
-                backgroundImage: NetworkImage(
-                    "https://images.pexels.com/photos/9802281/pexels-photo-9802281.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"),
+                backgroundImage: NetworkImage(profileImg!),
               ),
               SizedBox(
                 width: 10,
@@ -116,7 +116,7 @@ class _HomeState extends State<Home> {
               IconButton(onPressed: () {}, icon: Icon(Icons.more_horiz_sharp))
             ],
           ),
-          Text("Here go wherever i go"),
+          Divider(),
           Container(
             width: size.width * 1,
             height: size.height * 0.25,
@@ -141,6 +141,7 @@ class _HomeState extends State<Home> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       key = prefs.getString('key');
+      profileImg = prefs.getString("profile");
     });
   }
 
@@ -148,5 +149,8 @@ class _HomeState extends State<Home> {
     Api().getImg(key);
   }
 
-  Future<void> onRefresh() async {}
+  Future<void> onRefresh() async {
+    loadKey();
+    setState(() {});
+  }
 }
